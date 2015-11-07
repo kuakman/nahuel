@@ -1,25 +1,29 @@
 package com.nahuel.web.controller.impl;
 
-import com.nahuel.web.controller.Controller;
-
-import io.vertx.ext.web.Router;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.JadeTemplateEngine;
 
-public class BaseController implements Controller  {
+import com.google.inject.Inject;
+import com.nahuel.web.controller.Controller;
+import com.nahuel.web.core.provider.ProviderFactory;
 
-	protected Router router;
+public class BaseController implements Controller  {
 	
-	private JadeTemplateEngine engine;
+	@Inject ProviderFactory factory;
+	@Inject JadeTemplateEngine engine;
 	
-	protected String basePath = "/index";
+	@Override
+	public void map() {}
 	
-	public BaseController() {
-		this.engine = JadeTemplateEngine.create();
+	@Override
+	public Route route(String path, String method) {
+		return this.factory.get().getRouter().route(path);
 	}
 	
-	public void html(RoutingContext ctx) {
-		this.engine.render(ctx, "templates/index.jade", res -> {
+	@Override
+	public void html(RoutingContext ctx, String path) {
+		this.engine.render(ctx, path, res -> {
 			if(res.succeeded()) {
 				ctx.response().end(res.result());
 			} else {
@@ -28,6 +32,7 @@ public class BaseController implements Controller  {
 		});
 	}
 	
+	@Override
 	public void json(RoutingContext ctx) {
 		
 	}
